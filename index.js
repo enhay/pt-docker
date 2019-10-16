@@ -15,5 +15,4 @@ schedule.scheduleJob('*/20 * * * *', async () => {
     // 重启node进程已关闭browser
     process.exit(-1)
   }
-
 });
