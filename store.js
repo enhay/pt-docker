@@ -1,10 +1,22 @@
 const loki = require('lokijs')
 
-const db = new loki('pt.db')
+const db = new loki('pt.db', {
+  autoload:true,
+  autoloadCallback,
+  autosave:true
+});
 
-const cookies = db.addCollection('cookies')
-const torrents = db.addCollection('torrents');
+function autoloadCallback(){
+  db.addCollection('cookies');
+  db.addCollection('torrents');
+}
 
+function cookies(){
+  return db.getCollection('cookies');
+}
+function torrents(){
+  return db.getCollection('torrents');
+}
 
 module.exports = {
   db,
