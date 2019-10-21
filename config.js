@@ -1,25 +1,29 @@
-const config = require('config.json')
+const userConfig = require('./config.json')
 
 
-const siteDefaultConfig = {
+const defaultConfig = {
   'ourbits': {
-    link: 'http://ourbits.club/torrents.php',
-    downTemp: 'https://ourbits.club/download.php?id=$id&passkey=$passkey&https=1'
+    link: 'https://ourbits.club/torrents.php',
+    downTpl: 'https://ourbits.club/download.php?id=$id&passkey=$passkey&https=1',
+    count: 0,
   },
   'ttg': {
     link: 'https://totheglory.im/browse.php?c=M',
-    downTemp: 'https://totheglory.im/dl/$id/$passkey',
+    downTpl: 'https://totheglory.im/dl/$id/$passkey',
+    count: 0,
   },
   'mteam': {
-    link: 'https://pt.m-team.cc/adult.php',
-    mteam: 'https://pt.m-team.cc/download.php?id=$id&passkey=$passkey&https=1'
+    link: 'https://pt.m-team.cc/torrents.php',
+    downTpl: 'https://pt.m-team.cc/download.php?id=$id&passkey=$passkey&https=1',
+    count: 0,
   }
 }
-
-Object.keys(config).forEach((site) => {
-  const siteConfig = config[site];
-  Object.assign(siteDefaultConfig[site] || {site}, siteConfig);
-  siteConfig.downTemp = siteConfig.downTemp.replace('$passkey', siteConfig.passkey);
+const config = {};
+Object.keys(userConfig).forEach((site) => {
+   config[site] = {}; 
+  const uc = userConfig[site];
+  const dc = defaultConfig[site] || {};
+  Object.assign(config[site], dc, uc);
 })
 
 module.exports = config;

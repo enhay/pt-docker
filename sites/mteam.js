@@ -1,19 +1,52 @@
 
-async function mteam(page){
-  await page.waitFor('table.torrents');
-  const doms = await page.$$('.torrentname .embedded:first-child');
-  const elements = doms.slice(0, ourbits.count || 0)
-  elements.forEach(async (item) => {
-    const innerHtml = await page.evaluate(e => e.innerHTML, item);
-    if (!innerHtml.match(`alt="Free"`)){
-      return
-    }
-    const mr = a.match(/\?id=(\d{5,})/);
-    // 为啥没获取上呢？
-    if (!mr){
+const debug = require('debug')("pt:mteam");
+const { downOnce } = require('../util/down');
+const { LoginBase } = require('./login');
+
+
+class Mteam extends LoginBase {
+  constructor(config, page) {
+    super(config, page)
+  }
+  async run() {
+    try {
+      await this.login()
+      await page.screenshot({
+        path: 'mteam.png',
+        fullPage: false,
+      });
+    } catch (error) {
+      console.log(error);
       return;
     }
-    const torrentid = mr[1];
-    // 检查是否下载过， 
-  })
+    const ids = await this.getFreeTorrent();
+    const links = this.genDownLink(...ids);
+    console.log('mt', links);
+    downOnce(links);
+  }
+  async getFreeTorrent() {
+    await this.page.waitFor('table.torrents');
+    const doms = await this.page.$$('.torrentname .embedded:first-child');
+    const evalArr = doms.slice(0, config.count).map((item) => {
+      return this.page.evaluate(e => e.innerHTML, item).catch((err) => {
+        return '';
+      })
+    });
+    const domHtmls = await Promise.all(evalArr).catch((err) => {
+      return [];
+    });
+    const torrentids = [];
+    domHtmls.forEach((innerHtml) => {
+      if (!innerHtml.match('alt="Free"')) {
+        return
+      }
+      const idMatcher = innerHtml.match(/\?id=(\d{5,})/);
+      if (idMatcher) {
+        torrentids.push(idMatcher[1]);
+      }
+    })
+    return torrentids;
+  }
 }
+
+module.exports = Mteam;

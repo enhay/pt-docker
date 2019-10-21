@@ -9,6 +9,7 @@ const db = new loki('pt.db', {
 function autoloadCallback(){
   db.addCollection('cookies');
   db.addCollection('torrents');
+  console.log('auto load success')
 }
 
 function cookies(){

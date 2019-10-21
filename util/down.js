@@ -1,16 +1,17 @@
 const store = require('../store.js');
 const config = require('../config.js');
+const debug = require('debug')('pt:down')
 
 const { DownloaderHelper } = require('node-downloader-helper');
 
 async function download(link) {
-  const dl = new DownloaderHelper(link, config.dir);
-  dl.start().catch((err)=>{
-    
+  const dl = new DownloaderHelper(link, __dirname);
+  dl.start().catch((err) => {
+    console.log(err)
   });
 }
 
-async function downOnce(...links) {
+async function downOnce(links) {
   const collection = store.torrents(); //
   links.forEach((link) => {
     const entity = { link };
