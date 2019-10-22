@@ -1,27 +1,10 @@
 
 const debug = require('debug')("pt:ourbits");
-const { downOnce } = require('../util/down');
-const { LoginBase } = require('./login');
+const { SiteBase } = require('./login');
 
-
-class Ourbits extends LoginBase {
+class Ourbits extends SiteBase {
   constructor(config, page) {
     super(config, page)
-  }
-  async run() {
-    try {
-      await this.login()
-      await this.page.screenshot({
-        path: 'ourbits.png',
-        fullPage: false,
-      });
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-    const ids = await this.getFreeTorrent();
-    const links = this.genDownLink(...ids);
-    downOnce(links);
   }
   async getFreeTorrent() {
     await this.page.waitFor('table.torrents');

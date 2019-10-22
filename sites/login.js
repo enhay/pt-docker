@@ -1,42 +1,56 @@
 const store = require('../store.js');
-
-async function login(page, config) {
-  const cookieCollect = store.cookies();
-  // 设置cookie
-  const domain = config.link.match(/\:\/\/([^\/]+)/)[1]
-  const dc = cookieCollect.findOne({ domain })
-  if (dc) {
-    const cookies = dc.cookie;
-    await page.setCookie(...cookies)
-  }
-
-  await page.goto(config.link);
-  if (page.url() == config.link) {
-    return;
-  }
-  console.log(page.url() == config.link,page.url() ,config.link)
-  await page.waitFor(2000);
-  await page.type('input[name="username"]', config.username);
-  await page.type('input[name="password"]', config.password);
-  const promise = page.waitForNavigation({ waitUntil: 'load' });
-  await page.click('input[type="submit"]');
-  await promise;
-  const cookie = await page.cookies();
-  if (dc) {
-    dc.cookie = cookie;
-    cookieCollect.update(dc)
-  } else {
-    cookieCollect.insert({ domain, cookie })
-  }
-}
-
-class LoginBase {
+const debug = require('debug')('pt:sitebase');
+const { downOnce } = require('../util/down')
+class SiteBase {
   constructor(config, page) {
     this.page = page;
     this.config = config;
   }
+  async run() {
+    try {
+      await this.login()
+    } catch (error) {
+      debug(error)
+      return;
+    }
+    const ids = await this.getFreeTorrent();
+    const links = this.genDownLink(...ids);
+    downOnce(links);
+  }
   async login() {
-    await login(this.page, this.config)
+    const cookieCollect = store.cookies();
+    // 设置cookie
+    const domain = this.config.link.match(/\:\/\/([^\/]+)/)[1]
+    const dc = cookieCollect.findOne({ domain })
+    if (dc) {
+      const cookies = dc.cookie;
+      await this.page.setCookie(...cookies)
+    }
+
+    await this.page.goto(this.config.link);
+    if (this.page.url() == this.config.link) {
+      return;
+    }
+    await this.page.waitFor(2000);
+    await this.page.type('input[name="username"]', this.config.username);
+    await this.page.type('input[name="password"]', this.config.password);
+    const promise = this.page.waitForNavigation({ waitUntil: 'load' });
+    await this.beforeSubmitHook();
+    await this.page.click('[type="submit"]');
+    await promise;
+    const cookie = await this.page.cookies();
+    if (dc) {
+      dc.cookie = cookie;
+      cookieCollect.update(dc)
+    } else {
+      cookieCollect.insert({ domain, cookie })
+    }
+  }
+  async beforeSubmitHook() {
+
+  }
+  async getFreeTorrent() {
+    return [];
   }
   closePage() {
     this.page.close();
@@ -52,6 +66,5 @@ class LoginBase {
 }
 
 module.exports = {
-  login,
-  LoginBase
+  SiteBase
 }

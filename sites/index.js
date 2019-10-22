@@ -1,9 +1,11 @@
 const Promise = require('bluebird');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const config = require('../config.js');
 const Ourbits = require('./ourbits');
 const TTG = require('./ttg');
 const Mteam = require('./mteam');
+const CMCT = require('./cmct');
+const debug = require('debug')('pt:site')
 let browserWSEndpoint;
 
 
@@ -18,11 +20,11 @@ async function run() {
     return item.then((site) => {
       return site.run()
     }).catch((err) => {
-      console.log(err);
+      debug(err);
     })
   })
   await Promise.all(siteRunner)
-  
+  await Promise.delay(2000)
   try {
     await browser.disconnect();
   } catch (error) {
@@ -40,6 +42,8 @@ async function genSiteIns(site, page) {
       return new Mteam(siteConf, page);
     case 'ttg':
       return new TTG(siteConf, page);
+    case 'cmct':
+      return new CMCT(siteConf, page);
     default:
       return new EmptySite(siteConf, page);
   }
@@ -50,9 +54,10 @@ async function getBrowser() {
   if (!browserWSEndpoint) {
     browser = await puppeteer.launch({
       ignoreHTTPSErrors: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
+      executablePath: process.env.CHROME_BIN || null,
       defaultViewport: { width: 1280, height: 800 },
-      //headless: false,
+      headless: true,
     });
     browserWSEndpoint = browser.wsEndpoint();
     return browser;
@@ -61,7 +66,7 @@ async function getBrowser() {
     browser = await puppeteer.connect({ browserWSEndpoint })
     return browser;
   } catch (error) {
-    console.log(error);
+    debug(error);
     browser = await puppeteer.launch({
       ignoreHTTPSErrors: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
@@ -79,6 +84,7 @@ class EmptySite {
     this.page = page;
   }
   async run() {
+    await this.page.goto('https://www.baidu.com')
     await this.page.close();
   }
 }

@@ -1,32 +1,15 @@
 
 const debug = require('debug')("pt:mteam");
-const { downOnce } = require('../util/down');
-const { LoginBase } = require('./login');
+const { SiteBase } = require('./login');
 
 
-class Mteam extends LoginBase {
+class Mteam extends SiteBase {
   constructor(config, page) {
     super(config, page)
   }
-  async run() {
-    try {
-      await this.login()
-      await page.screenshot({
-        path: 'mteam.png',
-        fullPage: false,
-      });
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-    const ids = await this.getFreeTorrent();
-    const links = this.genDownLink(...ids);
-    console.log('mt', links);
-    downOnce(links);
-  }
   async getFreeTorrent() {
     await this.page.waitFor('table.torrents');
-    const doms = await this.page.$$('.torrentname .embedded:first-child');
+    const doms = await this.page.$$('.torrentname .embedded:nth-child(2)');
     const evalArr = doms.slice(0, config.count).map((item) => {
       return this.page.evaluate(e => e.innerHTML, item).catch((err) => {
         return '';

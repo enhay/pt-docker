@@ -16,6 +16,11 @@ const defaultConfig = {
     link: 'https://pt.m-team.cc/torrents.php',
     downTpl: 'https://pt.m-team.cc/download.php?id=$id&passkey=$passkey&https=1',
     count: 0,
+  },
+  'cmct':{
+    link:'https://springsunday.net/torrents.php',
+    downTpl: 'https://springsunday.net/download.php?id=$id&passkey=$passkey',
+    count: 0,
   }
 }
 const config = {};
