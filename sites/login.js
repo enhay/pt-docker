@@ -37,13 +37,13 @@ class SiteBase {
     if (this.page.url() == this.config.link) {
       return;
     }
-    await this.page.waitFor(2000);
+    await this.page.waitFor(3000);
     await this.page.type('input[name="username"]', this.config.username);
     await this.page.type('input[name="password"]', this.config.password);
-    const promise = this.page.waitForNavigation({ waitUntil: 'load' });
+    const promsie = this.page.waitForNavigation({ waitUntil: 'domcontentloaded' });
     await this.beforeSubmitHook();
     await this.page.click('[type="submit"]');
-    await promise;
+    await promsie;
     const cookie = await this.page.cookies();
     if (dc) {
       dc.cookie = cookie;

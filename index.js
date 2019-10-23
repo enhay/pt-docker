@@ -13,5 +13,4 @@ sites.run().finally((err) => {
   if (err){
     console.log(err);
   }
-  console.log('run with config',config);
 })

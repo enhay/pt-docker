@@ -10,7 +10,7 @@ class Mteam extends SiteBase {
   async getFreeTorrent() {
     await this.page.waitFor('table.torrents');
     const doms = await this.page.$$('.torrentname .embedded:nth-child(2)');
-    const evalArr = doms.slice(0, config.count).map((item) => {
+    const evalArr = doms.slice(0, this.config.count).map((item) => {
       return this.page.evaluate(e => e.innerHTML, item).catch((err) => {
         return '';
       })
