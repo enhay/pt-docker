@@ -1,6 +1,6 @@
 const Promise = require('bluebird');
 const puppeteer = require('puppeteer-core');
-const config = require('../config.js');
+const config = require('../config.js')['sites'];
 const Ourbits = require('./ourbits');
 const TTG = require('./ttg');
 const Mteam = require('./mteam');

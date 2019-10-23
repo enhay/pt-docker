@@ -1,5 +1,6 @@
 const store = require('../store.js');
 const debug = require('debug')('pt:sitebase');
+const config = require('../config.js');
 const { downOnce } = require('../util/down')
 class SiteBase {
   constructor(config, page) {
@@ -10,12 +11,17 @@ class SiteBase {
     try {
       await this.login()
     } catch (error) {
+      await this.page.screenshot({
+        path: `${config.torrentDir}/${this.config.site}.png`,
+        fullPage: true
+      })
       debug(error)
       return;
     }
     const ids = await this.getFreeTorrent();
     const links = this.genDownLink(...ids);
     downOnce(links);
+    await this.page.close();
   }
   async login() {
     const cookieCollect = store.cookies();
@@ -26,7 +32,7 @@ class SiteBase {
       const cookies = dc.cookie;
       await this.page.setCookie(...cookies)
     }
-
+    debug(`run page ${this.config.link}`);
     await this.page.goto(this.config.link);
     if (this.page.url() == this.config.link) {
       return;

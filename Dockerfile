@@ -1,7 +1,8 @@
 FROM node:10.16.3-alpine
 
 ENV CHROME_BIN="/usr/bin/chromium-browser" \
-  NODE_ENV="production"
+  NODE_ENV="production" \
+  CORN=20 
 RUN set -x \
   && apk update \
   && apk upgrade \
@@ -21,8 +22,8 @@ RUN set -x \
   && echo
 
 COPY . /app
-VOLUME ["/config", "/torrents"]
+RUN ln -s /app/torrent /data
+VOLUME ["/data"]
 WORKDIR /app
 RUN npm install --quiet
-RUN ls 
-CMD ["node", "index.js"]
+ENTRYPOINT  ["node", "index.js"]
