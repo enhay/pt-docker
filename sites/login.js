@@ -40,10 +40,10 @@ class SiteBase {
     await this.page.waitFor(3000);
     await this.page.type('input[name="username"]', this.config.username);
     await this.page.type('input[name="password"]', this.config.password);
-    const promsie = this.page.waitForNavigation({ waitUntil: 'domcontentloaded' });
+    const promise = this.page.waitForNavigation({ waitUntil: 'domcontentloaded' });
     await this.beforeSubmitHook();
     await this.page.click('[type="submit"]');
-    await promsie;
+    await promise;
     const cookie = await this.page.cookies();
     if (dc) {
       dc.cookie = cookie;

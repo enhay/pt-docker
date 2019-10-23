@@ -2,7 +2,7 @@
 ### 生成配置文件config.json
 ```
 
-// 支持的站点 ourbits ttg mteam
+// 支持的站点 ourbits ttg mteam cmct
 {
   "ourbits": {
     "username": "",
